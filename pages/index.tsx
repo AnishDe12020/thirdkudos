@@ -1,25 +1,46 @@
 import { Button, Container, Heading, Text } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {
-  useWalletModal,
-  WalletMultiButton,
-} from "@solana/wallet-adapter-react-ui";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useProgram } from "@thirdweb-dev/react/solana";
 import type { NextPage } from "next";
 import { MouseEventHandler, useCallback } from "react";
 
 // Default styles that can be overridden by your app
 
 const Home: NextPage = () => {
-  // Here's how to get the thirdweb SDK instance
-  // const sdk = useSDK();
-  // Here's how to get a nft collection
-  // const { program } = useProgram(
-  //   your_nft_collection_address,
-  //   "nft-collection"
-  // );
+  //
 
   const modalState = useWalletModal();
   const { wallet, connect, connected } = useWallet();
+
+  const { program } = useProgram(
+    "34depVJpfehqGGBEAC9G4TSnKxogQxoFP6dNUE3Q6KBq",
+    "nft-collection"
+  );
+
+  const mintTestNFT = async () => {
+    const address = await program.mint({
+      name: "NFT 1",
+      description: "This is a test NFT",
+      image:
+        "https://res.cloudinary.com/anishde12020/image/upload/v1654360780/Blogfolio/og.png",
+
+      properties: [
+        {
+          name: "Property 1",
+          value: "Value 1",
+        },
+      ],
+      attributes: [
+        {
+          name: "Attribute 1",
+          value: "Value 1",
+        },
+      ],
+    });
+
+    console.log(address);
+  };
 
   const handleConnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     e => {
@@ -36,9 +57,12 @@ const Home: NextPage = () => {
 
   return (
     <Container>
-      <Heading>idk some app</Heading>
+      <Heading as="h1">Thirdkudos</Heading>
       {connected ? (
-        <Text>Wallet connected, implement functionality</Text>
+        <>
+          <Text>Wallet connected, implement functionality</Text>
+          <Button onClick={mintTestNFT}>Mint test NFT</Button>
+        </>
       ) : (
         <Button onClick={handleConnectClick} colorScheme="green">
           Connect Wallet
