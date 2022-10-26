@@ -34,6 +34,7 @@ import type { NextPage } from "next";
 import { MouseEventHandler, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ExternalLink } from "react-feather";
+import cookieCutter from "cookie-cutter";
 
 type MintFormValues = {
   title: string;
@@ -79,6 +80,7 @@ const Home: NextPage = () => {
     setSvgUri(svgUri);
 
     try {
+      const thirdwebToken = cookieCutter.get("thirdweb_auth_token");
       const res = await axios.post(
         `${
           process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
@@ -93,6 +95,9 @@ const Home: NextPage = () => {
         },
         {
           withCredentials: true,
+          headers: {
+            Cookie: "thirdweb_auth_token=" + thirdwebToken,
+          },
         }
       );
 
