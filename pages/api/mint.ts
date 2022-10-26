@@ -2,63 +2,77 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk/solana";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!process.env.PRIVATE_KEY) {
-    console.error("No private key in environment");
-    return;
-  }
+  if (req.method === "POST") {
+    if (!process.env.PRIVATE_KEY) {
+      throw Error("No private key in environment");
+    }
 
-  if (!process.env.NEXT_PUBLIC_NFT_COLLECTION) {
-    console.error("No NFT collection address in environment");
-    return;
-  }
+    if (!process.env.NEXT_PUBLIC_NFT_COLLECTION) {
+      throw Error("No NFT collection address in environment");
+    }
 
-  const mintTo = req.query.mintTo as string | undefined;
+    const body = req.body;
 
-  if (!mintTo) {
-    console.error("No address provided");
-    return;
-  }
+    if (!body.mintTo) {
+      throw Error("No address provided");
+    }
 
-  try {
-    console.log("mint to", mintTo);
-    console.log("collection address", process.env.NEXT_PUBLIC_NFT_COLLECTION);
-    const sdk = ThirdwebSDK.fromPrivateKey(
-      "https://api.devnet.solana.com",
-      process.env.PRIVATE_KEY
-    );
+    if (!body.svgString) {
+      throw Error("No SVG string provided");
+    }
 
-    const program = await sdk.getProgram(
-      process.env.NEXT_PUBLIC_NFT_COLLECTION,
-      "nft-collection"
-    );
+    if (!body.title) {
+      throw Error("No title provided");
+    }
 
-    const metadata = {
-      name: "NFT 1",
-      description: "This is a test NFT",
-      image:
-        "https://res.cloudinary.com/anishde12020/image/upload/v1654360780/Blogfolio/og.png",
+    if (!body.senderAddress) {
+      throw Error("No sender address provided");
+    }
 
-      properties: [
-        {
-          name: "Property 1",
-          value: "Value 1",
-        },
-      ],
-      attributes: [
-        {
-          name: "Attribute 1",
-          value: "Value 1",
-        },
-      ],
-    };
+    try {
+      console.log("body", body);
+      console.log("collection address", process.env.NEXT_PUBLIC_NFT_COLLECTION);
+      const sdk = ThirdwebSDK.fromPrivateKey(
+        "https://api.devnet.solana.com",
+        process.env.PRIVATE_KEY
+      );
 
-    const address = await program.mintTo(mintTo, metadata);
+      const program = await sdk.getProgram(
+        process.env.NEXT_PUBLIC_NFT_COLLECTION,
+        "nft-collection"
+      );
 
-    console.log(address);
-    res.status(200).json({ status: "success", address });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ status: "error", error: e });
+      const metadata = {
+        name: body.title,
+        description: body.description,
+        image: body.svgString,
+
+        attributes: [
+          {
+            name: "Title",
+            value: body.title,
+          },
+          {
+            name: "Description",
+            value: body.description,
+          },
+          {
+            name: "Sender",
+            value: body.senderAddress,
+          },
+        ],
+      };
+
+      const address = await program.mintTo(body.mintTo, metadata);
+
+      console.log(address);
+      res.status(200).json({ status: "success", address });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({ status: "error", error: e });
+    }
+  } else {
+    res.status(405).json({ status: "error", error: "Method not allowed" });
   }
 };
 
