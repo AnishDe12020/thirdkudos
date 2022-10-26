@@ -34,7 +34,6 @@ import type { NextPage } from "next";
 import { MouseEventHandler, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ExternalLink } from "react-feather";
-import cookieCutter from "cookie-cutter";
 
 type MintFormValues = {
   title: string;
