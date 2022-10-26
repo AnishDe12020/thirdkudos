@@ -80,24 +80,17 @@ const Home: NextPage = () => {
     setSvgUri(svgUri);
 
     try {
-      const thirdwebToken = cookieCutter.get("thirdweb_auth_token");
+      console.log(document.cookie);
       const res = await axios.post(
         `${
           process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
         }/mint`,
-        // "/api/mint",
         {
           svgString: svgUri,
           title: values.title,
           description: values.description,
           mintTo: values.receiverWalletAddress,
           senderAddress: user.address,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            Cookie: "thirdweb_auth_token=" + thirdwebToken,
-          },
         }
       );
 
