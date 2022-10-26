@@ -22,7 +22,6 @@ import {
   Image,
   HStack,
   Link,
-  StatUpArrow,
   Icon,
 } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -35,6 +34,7 @@ import type { NextPage } from "next";
 import { MouseEventHandler, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ExternalLink } from "react-feather";
+import cookieCutter from "cookie-cutter";
 
 type MintFormValues = {
   title: string;
@@ -80,13 +80,22 @@ const Home: NextPage = () => {
     setSvgUri(svgUri);
 
     try {
-      const res = await axios.post("/api/mint", {
-        svgString: svgUri,
-        title: values.title,
-        description: values.description,
-        mintTo: values.receiverWalletAddress,
-        senderAddress: user.address,
-      });
+      const res = await axios.post(
+        `${
+          process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
+        }/mint`,
+        // "/api/mint",
+        {
+          svgString: svgUri,
+          title: values.title,
+          description: values.description,
+          mintTo: values.receiverWalletAddress,
+          senderAddress: user.address,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       setMintedAddress(res.data.address);
       onOpen();

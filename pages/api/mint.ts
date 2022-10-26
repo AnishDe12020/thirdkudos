@@ -4,6 +4,7 @@ import { getUser } from "../../auth.config";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
+    console.log(req.cookies);
     try {
       if (!process.env.PRIVATE_KEY) {
         throw Error("No private key in environment");
