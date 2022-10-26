@@ -9,15 +9,12 @@ import {
   Text,
   Textarea,
   chakra,
-  Flex,
   VStack,
-  HStack,
-  Box,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { PublicKey } from "@solana/web3.js";
-import { useProgram } from "@thirdweb-dev/react/solana";
 import axios from "axios";
 import { elementToSVG, inlineResources } from "dom-to-svg";
 import type { NextPage } from "next";
@@ -34,10 +31,8 @@ const Home: NextPage = () => {
   const modalState = useWalletModal();
   const { wallet, connect, connected, publicKey } = useWallet();
 
-  const { program } = useProgram(
-    "34depVJpfehqGGBEAC9G4TSnKxogQxoFP6dNUE3Q6KBq",
-    "nft-collection"
-  );
+  const buttonBg = useColorModeValue("green.400", "green.600");
+  const buttonHoverBg = useColorModeValue("green.500", "green.700");
 
   const {
     register,
@@ -51,8 +46,6 @@ const Home: NextPage = () => {
       console.error("No wallet connected");
       return;
     }
-
-    console.log("values", values);
 
     const svgDoc = elementToSVG(document.querySelector("#kudo") as Element);
 
@@ -69,8 +62,6 @@ const Home: NextPage = () => {
       mintTo: values.receiverWalletAddress,
       senderAddress: publicKey.toBase58(),
     });
-
-    console.log(res);
   };
 
   const handleConnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
@@ -150,7 +141,8 @@ const Home: NextPage = () => {
                 </FormErrorMessage>
               </FormControl>
               <Button
-                colorScheme="green"
+                backgroundColor={buttonBg}
+                _hover={{ backgroundColor: buttonHoverBg }}
                 isLoading={isSubmitting}
                 type="submit"
               >
@@ -185,7 +177,11 @@ const Home: NextPage = () => {
           </VStack>
         </>
       ) : (
-        <Button onClick={handleConnectClick} colorScheme="green">
+        <Button
+          onClick={handleConnectClick}
+          backgroundColor="green.600"
+          _hover={{ backgroundColor: "green.700" }}
+        >
           Connect Wallet
         </Button>
       )}

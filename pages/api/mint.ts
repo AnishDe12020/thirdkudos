@@ -30,8 +30,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     try {
-      console.log("body", body);
-      console.log("collection address", process.env.NEXT_PUBLIC_NFT_COLLECTION);
       const sdk = ThirdwebSDK.fromPrivateKey(
         "https://api.devnet.solana.com",
         process.env.PRIVATE_KEY
@@ -65,10 +63,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const address = await program.mintTo(body.mintTo, metadata);
 
-      console.log(address);
       res.status(200).json({ status: "success", address });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.status(500).json({ status: "error", error: e });
     }
   } else {
