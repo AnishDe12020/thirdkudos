@@ -240,9 +240,9 @@ const Home: NextPage = () => {
           Connect Wallet
         </Button>
       )}
-      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="4xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent bg="brand.secondary">
           <ModalHeader>Kudo Minted Successfully</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

@@ -1,13 +1,32 @@
-import { extendTheme, StyleFunctionProps } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
+import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
-  styles: {
-    global: (props: StyleFunctionProps) => ({
-      "html, body": {
-        background: mode("#f0f0f0", "#111111")(props),
+  semanticTokens: {
+    colors: {
+      "brand.primary": {
+        default: "#fafafa",
+        _dark: "#0f0f0f",
       },
-    }),
+      "brand.secondary": {
+        default: "#eeeeee",
+        _dark: "#222222",
+      },
+      "brand.tertiary": {
+        default: "#cecfd1",
+        _dark: "#303030",
+      },
+      "brand.quaternary": {
+        default: "#bdbdc2",
+        _dark: "#474747",
+      },
+    },
+  },
+  styles: {
+    global: {
+      "html, body": {
+        background: "brand.primary",
+      },
+    },
   },
   config: {
     initialColorMode: "dark",
