@@ -37,6 +37,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
+      if (user.address === body.mintTo) {
+        throw Error("Cannot mint to self");
+      }
+
       const sdk = ThirdwebSDK.fromPrivateKey(
         "https://api.devnet.solana.com",
         process.env.PRIVATE_KEY
