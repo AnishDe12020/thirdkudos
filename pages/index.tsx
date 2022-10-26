@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { PublicKey } from "@solana/web3.js";
 import { useProgram } from "@thirdweb-dev/react/solana";
 import axios from "axios";
 import { elementToSVG, inlineResources } from "dom-to-svg";
@@ -133,6 +134,14 @@ const Home: NextPage = () => {
                   placeholder="Receiver's Wallet Address"
                   {...register("receiverWalletAddress", {
                     required: "Wallet Address is required",
+                    validate: v => {
+                      try {
+                        new PublicKey(v);
+                        return true;
+                      } catch {
+                        return "Invalid Wallet Address";
+                      }
+                    },
                   })}
                 />
                 <FormErrorMessage>
