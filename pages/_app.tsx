@@ -15,7 +15,14 @@ const network: Network = "devnet";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ThirdwebProvider network={network}>
+    <ThirdwebProvider
+      network={network}
+      authConfig={{
+        authUrl: "/api/auth",
+        domain: process.env.VERCEL_URL || "localhost:3000",
+        loginRedirect: "/",
+      }}
+    >
       <WalletModalProvider>
         <ChakraProvider theme={theme}>
           <Header />

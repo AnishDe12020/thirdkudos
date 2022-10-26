@@ -1,35 +1,42 @@
 import { ThirdwebSDK } from "@thirdweb-dev/sdk/solana";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getUser } from "../../auth.config";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    if (!process.env.PRIVATE_KEY) {
-      throw Error("No private key in environment");
-    }
-
-    if (!process.env.NEXT_PUBLIC_NFT_COLLECTION) {
-      throw Error("No NFT collection address in environment");
-    }
-
-    const body = req.body;
-
-    if (!body.mintTo) {
-      throw Error("No address provided");
-    }
-
-    if (!body.svgString) {
-      throw Error("No SVG string provided");
-    }
-
-    if (!body.title) {
-      throw Error("No title provided");
-    }
-
-    if (!body.senderAddress) {
-      throw Error("No sender address provided");
-    }
-
     try {
+      if (!process.env.PRIVATE_KEY) {
+        throw Error("No private key in environment");
+      }
+
+      if (!process.env.NEXT_PUBLIC_NFT_COLLECTION) {
+        throw Error("No NFT collection address in environment");
+      }
+
+      const body = req.body;
+
+      if (!body.mintTo) {
+        throw Error("No address provided");
+      }
+
+      if (!body.svgString) {
+        throw Error("No SVG string provided");
+      }
+
+      if (!body.title) {
+        throw Error("No title provided");
+      }
+
+      if (!body.senderAddress) {
+        throw Error("No sender address provided");
+      }
+
+      const user = await getUser(req);
+
+      if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
       const sdk = ThirdwebSDK.fromPrivateKey(
         "https://api.devnet.solana.com",
         process.env.PRIVATE_KEY
