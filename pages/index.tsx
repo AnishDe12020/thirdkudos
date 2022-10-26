@@ -11,6 +11,19 @@ import {
   chakra,
   VStack,
   useColorModeValue,
+  useToast,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  Image,
+  HStack,
+  Link,
+  StatUpArrow,
+  Icon,
 } from "@chakra-ui/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
@@ -19,8 +32,9 @@ import { useLogin, useUser } from "@thirdweb-dev/react/solana";
 import axios from "axios";
 import { elementToSVG, inlineResources } from "dom-to-svg";
 import type { NextPage } from "next";
-import { MouseEventHandler, useCallback } from "react";
+import { MouseEventHandler, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { ExternalLink } from "react-feather";
 
 type MintFormValues = {
   title: string;
@@ -33,6 +47,11 @@ const Home: NextPage = () => {
   const { wallet, connect, connected, publicKey } = useWallet();
   const login = useLogin();
   const { user } = useUser();
+  const toast = useToast();
+  const { onOpen, onClose, isOpen } = useDisclosure();
+
+  const [svgUri, setSvgUri] = useState<string | null>(null);
+  const [mintedAddress, setMintedAddress] = useState<string | null>(null);
 
   const buttonBg = useColorModeValue("green.400", "green.600");
   const buttonHoverBg = useColorModeValue("green.500", "green.700");
@@ -58,13 +77,30 @@ const Home: NextPage = () => {
 
     const svgUri = `data:image/svg+xml,${encodeURIComponent(svgString)}`;
 
-    const res = await axios.post("/api/mint", {
-      svgString: svgUri,
-      title: values.title,
-      description: values.description,
-      mintTo: values.receiverWalletAddress,
-      senderAddress: user.address,
-    });
+    setSvgUri(svgUri);
+
+    try {
+      const res = await axios.post("/api/mint", {
+        svgString: svgUri,
+        title: values.title,
+        description: values.description,
+        mintTo: values.receiverWalletAddress,
+        senderAddress: user.address,
+      });
+
+      setMintedAddress(res.data.address);
+      onOpen();
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Failed to mint Kudo",
+        description:
+          "Something went wrong when minting the kudo, check the console for more information. Please try again later",
+        status: "error",
+        duration: 6000,
+        isClosable: true,
+      });
+    }
   };
 
   const handleConnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
@@ -204,6 +240,41 @@ const Home: NextPage = () => {
           Connect Wallet
         </Button>
       )}
+      <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Kudo Minted Successfully</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <HStack gap={8} mb={8}>
+              {svgUri && (
+                <Image src={svgUri} alt="Minted Kudo" h="256px" w="256px" />
+              )}
+              <VStack alignItems="flex-start" gap={16}>
+                <VStack alignItems="flex-start" gap={4}>
+                  <Text>Mint Address: {mintedAddress}</Text>
+                  <Text>Receiver: {watch("receiverWalletAddress")}</Text>
+                </VStack>
+
+                <VStack alignItems="flex-start" gap={4}>
+                  <Link
+                    href={`https://explorer.solana.com/address/${mintedAddress}?cluster=devnet`}
+                    isExternal
+                  >
+                    See on Solana Explorer <Icon as={ExternalLink} mx="2px" />
+                  </Link>
+                  <Link
+                    href={`https://solscan.io/token/${mintedAddress}?cluster=devnet`}
+                    isExternal
+                  >
+                    See on Solscan <Icon as={ExternalLink} mx="2px" />
+                  </Link>
+                </VStack>
+              </VStack>
+            </HStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
