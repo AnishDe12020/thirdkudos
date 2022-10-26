@@ -111,7 +111,7 @@ app.post("/mint", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 4000, () => {
+app.listen(process.env.PORT || 8080, () => {
   console.log(
     `Thirdkudos Backend listening on port ${process.env.PORT || 4000}!`
   );
